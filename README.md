@@ -73,3 +73,18 @@ flowchart TD
   D --> E[Set Content Themes]
   E --> F[Build Campaign Calendar]
   F --> G[Campaign Plan Ready]
+```
+3) Content generation flow
+```mermaid
+flowchart TD
+  A[Campaign Plan] --> B[Create Content Brief]
+  B --> C[Generate Draft Content]
+  C --> D[Check Tone and Brand Voice]
+  D --> E{Valid?}
+
+  E -->|No| F[Revise Draft]
+  F --> C
+
+  E -->|Yes| G[Adapt for Platform]
+  G --> H[Final Content Output]
+  ``` 
