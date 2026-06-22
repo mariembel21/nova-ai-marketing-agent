@@ -46,6 +46,7 @@ T --> U
 
 U --> V[Optimization & Strategy Tuning]
 ```
+
 ```mermaid
 flowchart TD
   U[User] --> S[Supervisor / Orchestrator]
