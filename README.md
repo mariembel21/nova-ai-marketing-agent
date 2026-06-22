@@ -63,3 +63,12 @@ flowchart TD
   L --> M{Approved?}
   M -->|No| B
   M -->|Yes| N[Continue Workflow]
+ 2) Campaign planning flow
+```mermaid
+flowchart TD
+  A[Marketing Strategy] --> B[Define Campaign Goals]
+  B --> C[Select Target Audience]
+  C --> D[Choose Channels]
+  D --> E[Set Content Themes]
+  E --> F[Build Campaign Calendar]
+  F --> G[Campaign Plan Ready]
