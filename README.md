@@ -108,3 +108,50 @@ flowchart TD
   E -->|Yes| G[Adapt for Platform]
   G --> H[Final Content Output]
   ``` 
+4) Media Generation diagram
+```mermaid
+flowchart TD
+  A[Need Media?] --> B{Media Required?}
+
+  B -->|No| C[Skip Media Generation]
+  B -->|Yes| D{Media Type?}
+
+  D -->|Single Image| E[Create Image Prompt]
+  D -->|Carousel| F[Define Carousel Goal]
+  D -->|PDF| G[Select PDF Template]
+  D -->|Other| H[Generate Alternative Media]
+
+  E --> I[Generate Image]
+  F --> J[Create Slide Outline]
+  G --> K[Prepare PDF Content]
+  H --> L[Prepare Media Asset]
+
+  I --> M[Check Image Quality]
+  J --> N[Generate Slides]
+  K --> O[Render Layout]
+  L --> P[Validate Alternative Media]
+
+  M --> Q{Approved?}
+  N --> R[Check Visual Consistency]
+  O --> S[Validate Formatting]
+  P --> T{Valid?}
+
+  Q -->|No| E
+  Q -->|Yes| U[Save Image]
+
+  R --> V{Approved?}
+  S --> W{Approved?}
+  T -->|No| D
+  T -->|Yes| X[Save Asset]
+
+  V -->|No| F
+  V -->|Yes| Y[Export Carousel Package]
+
+  W -->|No| G
+  W -->|Yes| Z[Export PDF]
+
+  U --> AA[Attach to Campaign]
+  Y --> AA
+  Z --> AA
+  X --> AA
+  ``` 
