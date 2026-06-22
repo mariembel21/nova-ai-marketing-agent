@@ -14,37 +14,37 @@ C --> D{Strategy Valid?}
 D -->|No| E[Ask User For Missing Data]
 E --> B
 
-D -->|Yes| F[Create Campaign Plan]
+D -->|Yes| F[Create Automated Campaign Plan]
 
-F --> G{Campaign Type?}
+F --> G{Channel Focus?}
 
-G -->|Social Media| H[Generate Social Content]
-G -->|Email Marketing| I[Generate Email Campaign]
-G -->|Both| J[Generate Social Content and Email Campaign]
+G -->|Social Media| H[Generate Social Media Content]
+G -->|Email Marketing| I[Generate Email Copy & Layout]
+G -->|Omnichannel| J[Generate Integrated Cross-Channel Content]
 
-H --> K[Generate Content]
-I --> L[Create Email Content]
+H --> K[Assemble Campaign Copy]
+I --> K
 J --> K
-J --> L
 
-K --> M{Need Media?}
-M -->|Yes| N[Generate Media Assets]
-M -->|No| O[Continue]
+K --> L{Need Visuals / Presentations?}
+L -->|Yes| M[Generate Media & Presentation Assets]
+L -->|No| N[Skip Asset Step]
 
-L --> P[Validate Email Content]
-N --> Q[Validate Content]
-O --> Q
+M --> O[Validate Integrated Content]
+N --> O
 
-P --> R[Schedule Email Campaign]
-Q --> S[Schedule Publication]
+O --> P[Schedule Distribution & Timelines]
 
-R --> T[Send Email Campaign]
-S --> U[Publish To Social Networks]
+P --> Q{Execution Channel}
+Q -->|Social Networks| R[Publish to LinkedIn, Instagram, FB, TikTok, X]
+Q -->|Email Marketing| S[Deploy Automated Email Campaign]
+Q -->|Presentations| T[Export Ready-to-Use Marketing Presentations]
 
-T --> V[Collect Analytics]
-U --> V
+R --> U[Collect Multi-Channel Analytics]
+S --> U
+T --> U
 
-V --> W[Optimization Suggestions]
+U --> V[Optimization & Strategy Tuning]
 ```
 ```mermaid
 flowchart TD
@@ -77,11 +77,11 @@ flowchart TD
   C -->|No| D[Ask for Missing Data]
   D --> A
 
-  C -->|Yes| E{What is Needed?}
+  C -->|Yes| E{Task Assignment}
 
   E -->|Strategy| F[Strategy Agent]
   E -->|Content| G[Content Agent]
-  E -->|Media| H[Media Agent]
+  E -->|Media & Presentations| H[Media Agent]
   E -->|Scheduling| I[Scheduling Agent]
   E -->|Publishing| J[Publishing Agent]
   E -->|Analytics| K[Analytics Agent]
@@ -120,39 +120,42 @@ flowchart TD
   E -->|No| F[Revise Draft]
   F --> C
 
-  E -->|Yes| G[Adapt for Platform]
-  G --> H[Final Content Output]
+  E -->|Yes| G{Content Format?}
+  
+  G -->|Social Post| H[Adapt for LinkedIn, Instagram, FB, TikTok, X]
+  G -->|Email Copy| I[Structure Email Text & Subject Line]
+  G -->|Presentation| J[Draft Marketing Presentation Outline]
+
+  H --> K[Final Content Output]
+  I --> K
+  J --> K
   ``` 
 4) Media Generation diagram
 ```mermaid
 flowchart TD
-  A[Need Media or Email Assets?] --> B{Asset Required?}
+  A[Need Media or Presentation Assets?] --> B{Asset Required?}
 
   B -->|No| C[Skip Asset Generation]
   B -->|Yes| D{Asset Type?}
 
   D -->|Single Image| E[Create Image Prompt]
   D -->|Carousel| F[Define Carousel Goal]
-  D -->|PDF| G[Select PDF Template]
-  D -->|Email Visual| H[Prepare Email Visual Asset]
-  D -->|Other| I[Generate Alternative Media]
+  D -->|Presentation PDF| G[Select Presentation Template]
+  D -->|Other Media| I[Generate Alternative Media]
 
   E --> J[Generate Image]
   F --> K[Create Slide Outline]
-  G --> L[Prepare PDF Content]
-  H --> M[Design Email Asset]
+  G --> L[Prepare Presentation Content]
   I --> N[Prepare Media Asset]
 
   J --> O[Check Image Quality]
   K --> P[Generate Slides]
   L --> Q[Render Layout]
-  M --> R[Validate Email Asset]
   N --> S[Validate Alternative Media]
 
   O --> T{Approved?}
   P --> U[Check Visual Consistency]
   Q --> V[Validate Formatting]
-  R --> W{Approved?}
   S --> X{Valid?}
 
   T -->|No| E
@@ -160,8 +163,6 @@ flowchart TD
 
   U --> Z{Approved?}
   V --> AA{Approved?}
-  W -->|No| H
-  W -->|Yes| AB[Save Email Asset]
   X -->|No| I
   X -->|Yes| AC[Save Asset]
 
@@ -169,31 +170,37 @@ flowchart TD
   Z -->|Yes| AD[Export Carousel Package]
 
   AA -->|No| G
-  AA -->|Yes| AE[Export PDF]
+  AA -->|Yes| AE[Export Presentation PDF]
 
   Y --> AF[Attach to Campaign]
   AD --> AF
   AE --> AF
-  AB --> AF
   AC --> AF
   ```
 
 5) Publishing flow
 ```mermaid
 flowchart TD
-  A[Final Content + Media] --> B[Validate Assets]
-  B --> C[Select Publish Time]
-  C --> D[Format for Platform]
-  D --> E[Publish to Social Network]
-  E --> F[Confirm Publication]
+  A[Final Content + Media Assets] --> B[Validate Channel Formats]
+  B --> C[Select Deployment Schedule]
+  C --> D{Distribution Channel?}
+  
+  D -->|Social Networks| E[Format for LinkedIn, Instagram, FB, TikTok, X]
+  D -->|Email Marketing| F[Queue in Email Automation System]
+  
+  E --> G[Automated Social Publication]
+  F --> H[Trigger Email Campaign Dispatch]
+  
+  G --> I[Confirm Live Status]
+  H --> I
   ```
 6) Analytics and optimization loop
 ```mermaid
 flowchart TD
-  A[Published Campaign] --> B[Collect Analytics]
-  B --> C[Measure Performance]
-  C --> D[Generate Insights]
-  D --> E[Optimization Suggestions]
-  E --> F[Update Strategy]
-  F --> G[Next Campaign]
+  A[Published Campaign / Dispatched Emails] --> B[Collect Multi-Channel Analytics]
+  B --> C[Measure Performance Metrics]
+  C --> D[Generate AI Insights]
+  D --> E[Formulate Optimization Suggestions]
+  E --> F[Update Central Strategy]
+  F --> G[Initiate Next Campaign Cycle]
   ```
