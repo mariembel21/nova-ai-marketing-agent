@@ -36,6 +36,7 @@ M --> N[Collect Analytics]
 N --> O[Optimization Suggestions]
 ```
 ## Supervisor orchestration flow
+```mermaid
 flowchart TD
   A[User Request] --> B[Supervisor]
   B --> C{Request Valid?}
