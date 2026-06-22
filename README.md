@@ -64,7 +64,7 @@ flowchart TD
   M -->|No| B
   M -->|Yes| N[Continue Workflow]
 ```
- 2) Campaign planning flow
+2) Campaign planning flow
 ```mermaid
 flowchart TD
   A[Marketing Strategy] --> B[Define Campaign Goals]
