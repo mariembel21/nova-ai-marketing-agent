@@ -35,6 +35,26 @@ M --> N[Collect Analytics]
 
 N --> O[Optimization Suggestions]
 ```
+```mermaid
+flowchart TD
+  U[User] --> S[Supervisor / Orchestrator]
+
+  S --> A[Strategy Agent]
+  S --> B[Content Agent]
+  S --> C[Media Agent]
+  S --> D[Scheduling Agent]
+  S --> E[Publishing Agent]
+  S --> F[Analytics Agent]
+
+  A --> S
+  B --> S
+  C --> S
+  D --> S
+  E --> S
+  F --> S
+
+  S --> O[Final Campaign Output]
+```
 1) Supervisor orchestration flow
 ```mermaid
 flowchart TD
