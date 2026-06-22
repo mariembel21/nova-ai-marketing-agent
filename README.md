@@ -155,3 +155,22 @@ flowchart TD
   Z --> AA
   X --> AA
   ``` 
+5) Publishing flow
+```mermaid
+   flowchart TD
+  A[Final Content + Media] --> B[Validate Assets]
+  B --> C[Select Publish Time]
+  C --> D[Format for Platform]
+  D --> E[Publish to Social Network]
+  E --> F[Confirm Publication]
+  ```
+6) Analytics and optimization loop
+```mermaid
+flowchart TD
+  A[Published Campaign] --> B[Collect Analytics]
+  B --> C[Measure Performance]
+  C --> D[Generate Insights]
+  D --> E[Optimization Suggestions]
+  E --> F[Update Strategy]
+  F --> G[Next Campaign]
+  ```
