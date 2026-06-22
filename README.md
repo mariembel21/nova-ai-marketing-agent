@@ -16,24 +16,35 @@ E --> B
 
 D -->|Yes| F[Create Campaign Plan]
 
-F --> G[Generate Content]
+F --> G{Campaign Type?}
 
-G --> H{Need Image?}
+G -->|Social Media| H[Generate Social Content]
+G -->|Email Marketing| I[Generate Email Campaign]
+G -->|Both| J[Generate Social Content and Email Campaign]
 
-H -->|Yes| I[Generate Image]
-
-H -->|No| J[Continue]
-
-I --> K[Validate Content]
+H --> K[Generate Content]
+I --> L[Create Email Content]
 J --> K
+J --> L
 
-K --> L[Schedule Publication]
+K --> M{Need Media?}
+M -->|Yes| N[Generate Media Assets]
+M -->|No| O[Continue]
 
-L --> M[Publish To Social Networks]
+L --> P[Validate Email Content]
+N --> Q[Validate Content]
+O --> Q
 
-M --> N[Collect Analytics]
+P --> R[Schedule Email Campaign]
+Q --> S[Schedule Publication]
 
-N --> O[Optimization Suggestions]
+R --> T[Send Email Campaign]
+S --> U[Publish To Social Networks]
+
+T --> V[Collect Analytics]
+U --> V
+
+V --> W[Optimization Suggestions]
 ```
 ```mermaid
 flowchart TD
