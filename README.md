@@ -63,6 +63,7 @@ flowchart TD
   L --> M{Approved?}
   M -->|No| B
   M -->|Yes| N[Continue Workflow]
+```
  2) Campaign planning flow
 ```mermaid
 flowchart TD
