@@ -85,17 +85,19 @@ flowchart TD
   E -->|Scheduling| I[Scheduling Agent]
   E -->|Publishing| J[Publishing Agent]
   E -->|Analytics| K[Analytics Agent]
+  E -->|Email Campaign| L[Email Marketing Agent]
 
-  F --> L[Supervisor Review]
-  G --> L
-  H --> L
-  I --> L
-  J --> L
-  K --> L
+  F --> M[Supervisor Review]
+  G --> M
+  H --> M
+  I --> M
+  J --> M
+  K --> M
+  L --> M
 
-  L --> M{Approved?}
-  M -->|No| B
-  M -->|Yes| N[Continue Workflow]
+  M --> N{Approved?}
+  N -->|No| B
+  N -->|Yes| O[Continue Workflow]
 ```
 2) Campaign planning flow
 ```mermaid
@@ -124,54 +126,61 @@ flowchart TD
 4) Media Generation diagram
 ```mermaid
 flowchart TD
-  A[Need Media?] --> B{Media Required?}
+  A[Need Media or Email Assets?] --> B{Asset Required?}
 
-  B -->|No| C[Skip Media Generation]
-  B -->|Yes| D{Media Type?}
+  B -->|No| C[Skip Asset Generation]
+  B -->|Yes| D{Asset Type?}
 
   D -->|Single Image| E[Create Image Prompt]
   D -->|Carousel| F[Define Carousel Goal]
   D -->|PDF| G[Select PDF Template]
-  D -->|Other| H[Generate Alternative Media]
+  D -->|Email Visual| H[Prepare Email Visual Asset]
+  D -->|Other| I[Generate Alternative Media]
 
-  E --> I[Generate Image]
-  F --> J[Create Slide Outline]
-  G --> K[Prepare PDF Content]
-  H --> L[Prepare Media Asset]
+  E --> J[Generate Image]
+  F --> K[Create Slide Outline]
+  G --> L[Prepare PDF Content]
+  H --> M[Design Email Asset]
+  I --> N[Prepare Media Asset]
 
-  I --> M[Check Image Quality]
-  J --> N[Generate Slides]
-  K --> O[Render Layout]
-  L --> P[Validate Alternative Media]
+  J --> O[Check Image Quality]
+  K --> P[Generate Slides]
+  L --> Q[Render Layout]
+  M --> R[Validate Email Asset]
+  N --> S[Validate Alternative Media]
 
-  M --> Q{Approved?}
-  N --> R[Check Visual Consistency]
-  O --> S[Validate Formatting]
-  P --> T{Valid?}
+  O --> T{Approved?}
+  P --> U[Check Visual Consistency]
+  Q --> V[Validate Formatting]
+  R --> W{Approved?}
+  S --> X{Valid?}
 
-  Q -->|No| E
-  Q -->|Yes| U[Save Image]
+  T -->|No| E
+  T -->|Yes| Y[Save Image]
 
-  R --> V{Approved?}
-  S --> W{Approved?}
-  T -->|No| D
-  T -->|Yes| X[Save Asset]
+  U --> Z{Approved?}
+  V --> AA{Approved?}
+  W -->|No| H
+  W -->|Yes| AB[Save Email Asset]
+  X -->|No| I
+  X -->|Yes| AC[Save Asset]
 
-  V -->|No| F
-  V -->|Yes| Y[Export Carousel Package]
+  Z -->|No| F
+  Z -->|Yes| AD[Export Carousel Package]
 
-  W -->|No| G
-  W -->|Yes| Z[Export PDF]
+  AA -->|No| G
+  AA -->|Yes| AE[Export PDF]
 
-  U --> AA[Attach to Campaign]
-  Y --> AA
-  Z --> AA
-  X --> AA
+  Y --> AF[Attach to Campaign]
+  AD --> AF
+  AE --> AF
+  AB --> AF
+  AC --> AF
   ```
 
 5) Publishing flow
 ```mermaid
-   flowchart TD
+flowchart TD
   A[Final Content + Media] --> B[Validate Assets]
   B --> C[Select Publish Time]
   C --> D[Format for Platform]
