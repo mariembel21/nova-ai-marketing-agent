@@ -51,20 +51,14 @@ flowchart TD
   U[User] --> S[Supervisor / Orchestrator]
 
   S --> A[Strategy Agent]
-  S --> B[Content Agent]
-  S --> C[Media Agent]
-  S --> D[Scheduling Agent]
-  S --> E[Publishing Agent]
-  S --> F[Analytics Agent]
-  S --> G[Email Marketing Agent]
+  S --> B[Content Generation Agent]
+  S --> C[Publishing Agent]
+  S --> D[Analytics & Scoring Agent]
 
   A --> S
   B --> S
   C --> S
   D --> S
-  E --> S
-  F --> S
-  G --> S
 
   S --> O[Final Campaign Output]
 ```
@@ -79,21 +73,15 @@ flowchart TD
 
   C -->|Yes| E{Task Assignment}
 
-  E -->|Strategy| F[Strategy Agent]
-  E -->|Content| G[Content Agent]
-  E -->|Media & Presentations| H[Media Agent]
-  E -->|Scheduling| I[Scheduling Agent]
-  E -->|Publishing| J[Publishing Agent]
-  E -->|Analytics| K[Analytics Agent]
-  E -->|Email Campaign| L[Email Marketing Agent]
+  E -->|Strategy & Planning| F[Strategy Agent]
+  E -->|Content & Media Assets| G[Content Generation Agent]
+  E -->|Scheduling, Email & Social Publishing| H[Publishing Agent]
+  E -->|Analytics & Performance Scoring| I[Analytics & Scoring Agent]
 
   F --> M[Supervisor Review]
   G --> M
   H --> M
   I --> M
-  J --> M
-  K --> M
-  L --> M
 
   M --> N{Approved?}
   N -->|No| B
