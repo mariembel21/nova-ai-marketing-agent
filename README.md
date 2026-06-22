@@ -56,6 +56,7 @@ flowchart TD
   S --> D[Scheduling Agent]
   S --> E[Publishing Agent]
   S --> F[Analytics Agent]
+  S --> G[Email Marketing Agent]
 
   A --> S
   B --> S
@@ -63,6 +64,7 @@ flowchart TD
   D --> S
   E --> S
   F --> S
+  G --> S
 
   S --> O[Final Campaign Output]
 ```
