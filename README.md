@@ -154,7 +154,8 @@ flowchart TD
   Y --> AA
   Z --> AA
   X --> AA
-  ``` 
+  ```
+
 5) Publishing flow
 ```mermaid
    flowchart TD
