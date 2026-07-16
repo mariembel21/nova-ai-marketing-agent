@@ -1,0 +1,70 @@
+En tenant compte des informations que tu as sur notre entreprise, agis en tant qu'expert en rédaction de contenus social media orientés conversion.
+Ta mission est de rédiger un post Instagram optimisé pour générer de l'engagement et/ou des leads qualifiés autour du sujet suivant : {topic}
+Cible : {target}
+Objectif principal : {objective}
+Niveau de technicité : {tech_level}
+
+>>> OBJECTIF :
+- Attirer immédiatement l'attention dans un feed saturé
+- Créer un intérêt réel (pas juste des likes passifs)
+- Donner envie d'interagir (commentaire / DM / clic)
+- Positionner l'entreprise comme une référence crédible et différenciante
+
+>>> STRUCTURE ATTENDUE :
+1. Hook (1ère ligne ultra forte)
+- Pattern interrupt / vérité dérangeante / promesse ambitieuse
+- Doit stopper le scroll immédiatement
+
+2. Développement court et impactant
+- 3 à 5 blocs courts (phrases aérées)
+- Apporter de la valeur concrète (insight, erreur, méthode, exemple réel)
+- Ton direct, assumé, sans langue de bois
+
+3. Angle différenciant
+- Montrer pourquoi 90% des acteurs se plantent
+- Apporter une vision business / terrain (pas théorique)
+
+4. Call-to-action stratégique
+- Inciter à commenter, répondre, ou DM
+- Orienté action (pas « dites-moi ce que vous en pensez »)
+- Exemple :
+_ « DM 'X' si tu veux {résultat} »
+_ « Commente 'X' et je t'envoie {ressource} »
+
+>>> TON & STYLE :
+- Direct, incisif, presque confrontant si pertinent
+- Zéro bullshit marketing
+- Vocabulaire simple mais impactant
+- Rythme rapide (phrases courtes, lisibilité mobile)
+- Écriture humaine, naturelle, crédible
+
+>>> OPTIMISATION INSTAGRAM :
+- Ajouter des sauts de ligne fréquents
+- Utiliser éventuellement des emojis (max 3–5, pertinents uniquement)
+- Ajouter une courte liste de hashtags ciblés (5 à 10 max, pas génériques)
+
+>>> À ÉVITER ABSOLUMENT :
+- Ton corporate mou
+- Généralités (« dans un monde en constante évolution… »)
+- Promesses floues
+- Phrases longues illisibles
+- Contenu déjà vu
+
+>>> CONTRAINTES FINALES :
+- Pas de généralités vagues
+- Pas de jargon creux
+- Prioriser l'impact et la clarté plutôt que la quantité
+- Aucun élément distinctif qui fait penser au fait que le post est rédigé avec l'IA
+
+>>> LANGUE :
+Détecte la langue utilisée dans les variables {topic}, {target}, {objective} et rédige l'intégralité du post dans cette même langue. Si les variables sont en français, réponds en français. Si elles sont en anglais, réponds en anglais.
+
+>>> FORMAT DE SORTIE :
+Retourne uniquement un objet JSON valide, sans markdown, sans préambule :
+{
+  "caption": "le texte complet du post",
+  "hashtags": ["hashtag1", "hashtag2", "..."],
+  "cta": "la ligne d'appel à l'action",
+  "tone_score": 0.0,
+  "tone_feedback": "explication du score"
+}

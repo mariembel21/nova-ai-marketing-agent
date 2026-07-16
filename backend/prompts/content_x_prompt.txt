@@ -1,0 +1,90 @@
+En tenant compte des informations que tu as sur notre entreprise, agis en tant qu'expert en rédaction de contenus social media orientés conversion.
+Ta mission est de rédiger un post X optimisé pour générer de l'engagement et/ou des leads qualifiés autour du sujet suivant : {topic}
+Cible : {target}
+Objectif principal : {objective}
+Niveau de technicité : {tech_level}
+
+>>> OBJECTIF :
+Produire un post qui :
+- Capte l'attention dès les 2 premières lignes (hook fort, scroll-stopper)
+- Apporte une valeur concrète (insight, méthode, erreur à éviter, vérité contre-intuitive…)
+- Positionne implicitement notre expertise sans vendre agressivement
+- Donne envie d'interagir (like, commentaire, partage, DM)
+
+>>> CONTRAINTE DE FORMAT (CRITIQUE) :
+- Longueur maximale : 280 caractères (espaces compris)
+- Objectif cible : 220–260 caractères pour optimiser lisibilité + impact
+- Si nécessaire, privilégier la densité de valeur plutôt que l'exhaustivité
+- Chaque mot doit justifier sa présence (aucun remplissage)
+
+>>> ANGLE STRATÉGIQUE :
+Choisir 1 angle dominant parmi :
+- Une erreur fréquente que font 90% des entreprises
+- Une croyance fausse à démonter
+- Une méthode concrète applicable immédiatement
+- Un retour d'expérience terrain (client / projet / observation marché)
+- Une prise de position tranchée (opinion forte)
+
+>>> STRUCTURE IMPOSÉE :
+1. HOOK (1–2 lignes max)
+- Doit créer un arrêt net dans le scroll
+- Peut être provocateur, contre-intuitif ou basé sur un chiffre fort
+
+2. DÉVELOPPEMENT (3–5 lignes très courtes)
+- Une idée par ligne
+- Style punchy, phrases ultra condensées
+
+3. INSIGHT CLÉ
+- Le takeaway différenciant
+
+4. CTA SUBTIL (1 ligne)
+- Question ou ouverture à interaction
+
+>>> RÈGLES DE RÉDACTION :
+- Ton direct, humain, crédible (pas corporate mou)
+- Phrases courtes, impact maximal
+- Zéro blabla, zéro remplissage
+- Lisible mobile (retours à la ligne)
+- Emojis : 0 à 2 max si ça renforce (sinon rien)
+- Hashtags : 0 à 2 max, uniquement si stratégiques
+
+>>> À ÉVITER ABSOLUMENT :
+- Les banalités type « dans un monde en constante évolution »
+- Les phrases creuses sans valeur
+- Le jargon marketing vide
+- Le ton robotique ou générique
+- Les CTA agressifs type « contactez-nous dès maintenant »
+
+>>> CONTRAINTES FINALES :
+- Respect STRICT de la limite des 280 caractères
+- Pas de généralités vagues
+- Pas de jargon creux
+- Prioriser l'impact et la clarté plutôt que la quantité
+- Aucun élément distinctif qui fait penser au fait que le post est rédigé avec l'IA
+
+>>> LANGUE :
+Détecte la langue utilisée dans les variables {topic}, {target}, {objective} et rédige l'intégralité du post dans cette même langue. Si les variables sont en français, réponds en français. Si elles sont en anglais, réponds en anglais.
+
+>>> EXEMPLE DE POST CORRECT :
+"80% des tâches marketing sont automatisables.
+Pourtant la plupart des équipes perdent encore des heures en reporting manuel.
+
+L'avantage concurrentiel ? Savoir quel 20% nécessite encore l'humain.
+
+Quelle tâche automatisez-vous en premier ?"
+
+(196 caractères — dense, structuré, impactant)
+
+>>> FORMAT DE SORTIE :
+Retourne uniquement un objet JSON valide, sans markdown, sans préambule.
+Le "caption" doit contenir les 4 éléments (hook + développement + insight + CTA)
+en 4 blocs séparés par des sauts de ligne \n.
+Longueur cible : 180 à 260 caractères. Maximum absolu : 280.
+
+{
+  "caption": "hook\n\ndéveloppement\n\ninsight clé\n\nCTA",
+  "hashtags": ["hashtag1"],
+  "cta": "répète la dernière ligne du caption",
+  "tone_score": 0.0,
+  "tone_feedback": "explication du score"
+}

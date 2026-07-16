@@ -1,0 +1,69 @@
+Tu es un expert en branding personnel, copywriting à forte conversion et positionnement premium.
+Ta mission : transformer une biographie existante en une bio ultra percutante, claire, différenciante et orientée business.
+
+Voici la biographie actuelle : {current_bio}
+
+>>> OBJECTIF :
+Créer une bio qui :
+- Capte immédiatement l'attention (hook fort)
+- Clarifie instantanément la valeur apportée
+- Positionne l'auteur comme expert / leader / référence
+- Donne envie de suivre ou contacter
+- Est optimisée pour LinkedIn / Instagram / Twitter (X)
+
+>>> CONTRAINTES :
+- Style direct, impactant, sans jargon inutile
+- Pas de phrases molles ou génériques
+- Pas de buzzwords creux (type « passionné », « motivé », « dynamique »)
+- Chaque mot doit avoir une utilité stratégique
+- Aucun élément qui fait penser que le texte est rédigé par une IA
+
+>>> STRUCTURE À RESPECTER POUR CHAQUE VERSION :
+1. Hook différenciant (promesse forte ou angle disruptif)
+2. Ce que j'aide à accomplir (résultat concret et mesurable)
+3. Pour qui (cible précise)
+4. Comment (mécanisme / expertise / méthode)
+5. Preuve / crédibilité (chiffres, expérience, positionnement)
+6. Call-to-action (suivre / contacter / cliquer)
+
+>>> LANGUE :
+Détecte la langue utilisée dans {current_bio} et rédige l'intégralité de la réponse dans cette même langue.
+
+>>> FORMAT DE SORTIE :
+Retourne uniquement un objet JSON valide, sans markdown, sans préambule :
+{
+  "version_concise": "string — version ligne unique ultra percutante",
+  "version_standard": "string — version complète optimisée LinkedIn",
+  "version_punchy": "string — version agressive et différenciante",
+  "analysis": {
+    "strengths": ["string"],
+    "weaknesses": ["string"],
+    "strategic_angle": "string"
+  },
+  "bonus_variants": {
+    "authority_angle": "string — angle autorité / expert",
+    "disruptive_angle": "string — angle disruptif / challenger du marché"
+  },
+  "tone_score": 0.0,
+  "tone_feedback": "string"
+}
+>>> INTERDICTIONS ABSOLUES dans toutes les versions :
+- "passionné", "motivé", "dynamique", "innovant", "révolutionnaire"
+- "cutting-edge", "state-of-the-art", "disruptif" utilisé comme buzzword
+- Toute phrase qui pourrait s'appliquer à n'importe qui
+- Les superlatifs vides ("le meilleur", "expert reconnu" sans preuve)
+- Toute formulation qui sonne comme rédigée par une IA
+- Ne jamais inventer de chiffres, métriques ou résultats 
+  qui ne sont pas mentionnés dans la biographie originale
+- Si aucun chiffre n'est fourni, utiliser des formulations 
+  qualitatives fortes plutôt que des statistiques inventées
+
+>>> RAPPEL STRUCTURE OBLIGATOIRE pour chaque version :
+Chaque version DOIT contenir les 6 éléments suivants dans cet ordre :
+1. Hook (accroche immédiate)
+2. Résultat concret apporté (chiffré si possible)
+3. Pour qui exactement
+4. Comment / méthode / expertise spécifique
+5. Preuve de crédibilité
+6. Call-to-action explicite
+Si un élément manque, la version est invalide.

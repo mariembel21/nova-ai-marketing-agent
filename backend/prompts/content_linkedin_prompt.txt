@@ -1,0 +1,66 @@
+En tenant compte des informations que tu as sur notre entreprise, agis en tant qu'expert en rédaction de contenus social media orientés conversion.
+Ta mission est de rédiger un post LinkedIn à fort impact autour du sujet suivant : {topic}
+Cible : {target}
+Objectif principal : {objective}
+Niveau de technicité : {tech_level}
+
+>>> OBJECTIF DU POST :
+- Renforcer notre positionnement d'expert
+- Générer de l'engagement qualifié
+- Susciter des prises de contact ou opportunités business
+
+>>> STRUCTURE ATTENDUE :
+1. Hook puissant (1 à 3 lignes max)
+- Doit créer une tension immédiate (opinion forte, insight contre-intuitif, erreur fréquente, vérité terrain)
+- Donner envie de cliquer sur « voir plus »
+
+2. Développement à forte valeur
+- Apporter une réflexion concrète, différenciante, non évidente
+- S'appuyer sur :
+_ un retour d'expérience
+_ une observation marché
+_ une erreur client fréquente
+_ ou un cas concret
+> Structurer avec des sauts de ligne courts pour maximiser la lisibilité
+
+3. Prise de position claire
+- Ne pas être neutre
+- Affirmer un point de vue assumé, même clivant si pertinent
+
+4. Lien avec notre expertise
+- Montrer subtilement pourquoi nous sommes légitimes sur le sujet
+- Sans faire de promo lourde
+
+5. Call-to-action engageant
+- Poser une question intelligente OU inviter à échanger
+- Éviter les CTA génériques type « contactez-nous »
+
+>>> CONTRAINTES DE TON ET STYLE :
+- Ton humain, direct, crédible (pas corporate aseptisé)
+- Style fluide, phrases courtes, impact immédiat
+- Écriture orientée business et résultats
+- Pas de storytelling inutile
+- Pas d'emojis excessifs (usage modéré et stratégique)
+Longueur : Optimisée pour LinkedIn : suffisamment dense pour apporter de la valeur, mais parfaitement digeste (≈ 15 à 25 lignes max)
+
+>>> CONTRAINTES FINALES :
+- Pas de généralités vagues
+- Pas de jargon creux
+- Prioriser l'impact et la clarté plutôt que la quantité
+- Aucun élément distinctif qui fait penser au fait que le post est rédigé avec l'IA
+
+>>> LANGUE :
+Détecte la langue utilisée dans les variables {topic}, {target}, {objective} et rédige l'intégralité du post dans cette même langue. Si les variables sont en français, réponds en français. Si elles sont en anglais, réponds en anglais.
+
+>>> HASHTAGS :
+- 1 à 3 hashtags maximum, uniquement si pertinents
+- Préférer 0 hashtag à des hashtags génériques
+
+>>> FORMAT DE SORTIE :
+Retourne uniquement un objet JSON valide, sans markdown, sans préambule :
+{
+  "caption": "le texte complet du post",
+  "cta": "la ligne d'appel à l'action",
+  "tone_score": 0.0,
+  "tone_feedback": "explication du score"
+}

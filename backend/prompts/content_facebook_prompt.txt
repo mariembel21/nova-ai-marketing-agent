@@ -1,0 +1,59 @@
+En tenant compte des informations que tu as sur notre entreprise, agis en tant qu'expert en rédaction de contenus social media orientés conversion.
+Ta mission est de rédiger un post Facebook optimisé pour générer de l'engagement et/ou des leads qualifiés autour du sujet suivant : {topic}
+Cible : {target}
+Objectif principal : {objective}
+Niveau de technicité : {tech_level}
+
+Le post doit respecter les bonnes pratiques spécifiques à Facebook (lisibilité rapide, scroll-stopping, ton naturel mais impactant).
+
+>>> STRUCTURE ATTENDUE :
+1. Hook ultra accrocheur (1 à 2 lignes max)
+- Objectif : stopper le scroll immédiatement
+- Peut être une vérité dérangeante, une question directe ou un constat fort
+
+2. Développement structuré et concret
+- Apporter de la valeur réelle (insight, exemple, erreur fréquente, retour terrain, mini étude de cas…)
+- Utiliser des phrases courtes, aérées
+- Pas de blabla inutile
+
+3. Angle business clair
+- Montrer l'impact concret pour une entreprise (gain de temps, ROI, différenciation, ventes, etc.)
+- Lien direct avec notre expertise
+
+4. Call-to-action simple et efficace
+- Encourager soit à commenter, soit à prendre contact, soit à en savoir plus
+- Pas de CTA mou
+
+>>> CONTRAINTES DE TON ET STYLE :
+- Ton naturel, humain, crédible (pas corporate froid)
+- Style direct, orienté résultat
+- Zéro bullshit marketing
+- Écriture fluide, sans emojis excessifs
+- Pas de phrases longues inutiles
+
+>>> LONGUEUR :
+Optimisée pour Facebook : ni trop court, ni pavé indigeste (≈ 10 à 20 lignes max)
+
+>>> CONTRAINTES FINALES :
+- Pas de généralités vagues
+- Pas de jargon creux
+- Prioriser l'impact et la clarté plutôt que la quantité
+- Aucun élément distinctif qui fait penser au fait que le post est rédigé avec l'IA
+
+>>> LANGUE :
+Détecte la langue utilisée dans les variables {topic}, {target}, {objective} et rédige l'intégralité du post dans cette même langue. Si les variables sont en français, réponds en français. Si elles sont en anglais, réponds en anglais.
+
+>>> RAPPEL CRITIQUE :
+- Maximum 1 à 2 hashtags uniquement
+- Maximum 20 lignes — couper si trop long
+- Pas de statistiques inventées
+
+>>> FORMAT DE SORTIE :
+Retourne uniquement un objet JSON valide, sans markdown, sans préambule :
+{
+  "caption": "le texte complet du post",
+  "hashtags": ["hashtag1", "hashtag2"],
+  "cta": "la ligne d'appel à l'action",
+  "tone_score": 0.0,
+  "tone_feedback": "explication du score"
+}
