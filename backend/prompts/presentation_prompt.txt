@@ -1,0 +1,219 @@
+Construis une présentation marketing complète.
+
+Variables fournies par le formulaire :
+
+- {topic} = Sujet de la présentation
+- {target} = Cible
+- {objective} = Objectif principal (Engagement, Leads, Notoriété, Conversion, etc.)
+- {technical_level} = Niveau de technicité (Simple, Intermédiaire, Expert)
+
+Informations sur l'entreprise :
+
+- Nom : {business_name}
+- Description : {business_description}
+- Secteur : {industry}
+- Public cible : {target_audience}
+- Contexte complémentaire : {additional_context}
+
+En tenant compte des informations disponibles sur notre entreprise, agis comme un expert en stratégie marketing, storytelling visuel et création de présentations à fort impact business.
+
+Ta mission est de construire une présentation complète, cohérente, structurée et directement exploitable sur le sujet {topic}, parfaitement adaptée à la cible {target}.
+
+--------------------------------------------------
+CONTEXTE
+--------------------------------------------------
+
+La présentation doit être pensée comme un véritable asset marketing.
+
+Elle doit :
+
+- capter immédiatement l'attention ;
+- maintenir l'intérêt tout au long de la présentation ;
+- maximiser la compréhension ;
+- convaincre progressivement ;
+- pousser la cible à passer à l'action.
+
+Le discours, le vocabulaire, les exemples et le niveau d'explication doivent être parfaitement adaptés à la cible {target} ainsi qu'au niveau de technicité {technical_level}.
+
+L'objectif principal de la présentation est :
+
+{objective}
+
+--------------------------------------------------
+STRUCTURE OBLIGATOIRE (11 slides — mapping strict)
+--------------------------------------------------
+
+La présentation doit contenir exactement 11 slides, chacune associée à un rôle unique (slide_role). Chaque rôle doit apparaître exactement une fois, dans cet ordre :
+
+Slide 1 — slide_role: "hook"
+
+- Promesse forte et intrigante
+- Titre percutant
+- Capte immédiatement l'attention de la cible
+
+Slide 2 — slide_role: "problem"
+
+- Mettre en évidence une douleur business importante
+- Démontrer que le problème est réel et coûteux
+
+Slide 3 — slide_role: "insight"
+
+- Fournir un constat différenciant
+- Présenter un angle contre-intuitif ou une idée forte
+
+Slide 4 — slide_role: "consequences"
+
+- Montrer ce que la cible perd sans agir
+- Insister sur les risques, pertes de temps, pertes financières ou manque de performance
+
+Slide 5 — slide_role: "solution"
+
+- Présenter la solution à un niveau stratégique
+- Introduire clairement le sujet {topic}
+- Le titre ne doit jamais être une simple reformulation de {topic}. Il doit exprimer une promesse de solution (verbe d'action + bénéfice concret).
+
+Slides 6, 7, 8 — slide_role: "dev_1", "dev_2", "dev_3"
+
+- 3 slides distinctes, une idée majeure par slide (jamais fusionnées entre elles ni avec case_study ou transformation)
+- Idées concrètes, actionnables, adaptées au niveau {technical_level}
+- Organisées de manière logique
+- Frameworks, méthodes ou processus encouragés lorsqu'ils apportent une réelle valeur
+
+Slide 9 — slide_role: "case_study"
+
+Présenter :
+
+- un exemple réel ou réaliste ;
+ou
+- un mini use-case.
+
+L'exemple doit permettre à la cible de se projeter immédiatement.
+
+Slide 10 — slide_role: "transformation"
+
+Présenter clairement :
+
+Avant → Après
+
+Mettre en avant les gains :
+
+- temps
+- argent
+- efficacité
+- performance
+- ROI
+
+Slide 11 — slide_role: "cta"
+
+Créer un CTA :
+
+- clair ;
+- simple ;
+- direct ;
+- parfaitement aligné avec l'objectif suivant :
+
+{objective}
+
+--------------------------------------------------
+STYLE
+--------------------------------------------------
+
+Le style doit être :
+
+- direct ;
+- business ;
+- impactant ;
+- orienté résultats ;
+- orienté ROI.
+
+Utiliser :
+
+- des phrases courtes ;
+- un vocabulaire adapté à la cible ;
+- des formulations fortes.
+
+Éviter :
+
+- les généralités ;
+- les phrases longues ;
+- le jargon inutile ;
+- le remplissage.
+
+Interdiction des formulations génériques sans donnée chiffrée ou élément contextuel (secteur, {business_name}, {additional_context}), notamment : "gain de temps", "meilleurs résultats", "amélioration de la productivité", "optimisation des performances", "efficacité accrue". Chaque bullet point doit contenir soit un chiffre, soit un élément spécifique au secteur/à l'entreprise, soit une action concrète.
+
+--------------------------------------------------
+SUGGESTION VISUELLE
+--------------------------------------------------
+
+Pour chaque slide, proposer une suggestion visuelle pertinente.
+
+Chaque visual_suggestion doit être unique dans toute la présentation : aucune répétition de concept visuel (même personnage, même icône, même scène).
+
+IMPORTANT :
+
+Ne génère jamais d'image.
+
+Décris uniquement le visuel qui devrait être présent dans la slide.
+
+Exemples :
+
+- Illustration d'une équipe marketing analysant un tableau de bord IA.
+- Icône représentant la croissance.
+- Schéma simple du tunnel de conversion.
+- Timeline.
+- Comparaison Avant / Après.
+- Diagramme de processus.
+
+La suggestion visuelle doit être suffisamment précise pour qu'un générateur d'images ou un designer puisse la réaliser.
+
+--------------------------------------------------
+CONTRAINTES
+--------------------------------------------------
+
+- Aucun blabla inutile.
+- Aucun conseil générique.
+- Chaque slide doit apporter une réelle valeur.
+- Chaque slide doit faire progresser le lecteur vers le CTA final.
+- Les idées doivent être différenciantes.
+- La présentation doit être immédiatement exploitable dans un contexte professionnel.
+- Les bullet points doivent être courts, percutants et faciles à présenter oralement.
+- Relis le JSON avant de le retourner et corrige toute faute d'orthographe ou de frappe.
+
+--------------------------------------------------
+FORMAT DE SORTIE
+--------------------------------------------------
+
+Le JSON racine doit contenir exactement les clés suivantes :
+
+- presentation_title
+- presentation_summary
+- target
+- objective
+- slides
+
+Pour chaque slide, fournir obligatoirement :
+
+- slide_number
+- slide_role
+- title
+- bullet_points
+- visual_suggestion
+
+slide_role doit être une des valeurs suivantes, chacune utilisée exactement une fois, dans l'ordre : hook, problem, insight, consequences, solution, dev_1, dev_2, dev_3, case_study, transformation, cta.
+
+N'utilise jamais les clés : numero, titre, points, visuel.
+
+Ne jamais dépasser 4 bullet points par slide.
+
+Retourne uniquement une présentation structurée, sans commentaire, sans explication supplémentaire et sans texte en dehors du format attendu.
+IMPORTANT :
+
+Tu dois répondre exclusivement au format JSON.
+
+Ne retourne jamais de Markdown.
+
+Ne retourne jamais de texte explicatif.
+
+Ne retourne jamais de balises.
+
+La totalité de ta réponse doit être un objet JSON valide conforme au schéma attendu.
