@@ -9,6 +9,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class SocialPlatform(str, Enum):
     LINKEDIN = "linkedin"
+    FACEBOOK = "facebook"
+    INSTAGRAM = "instagram"
 
 
 class SocialAccountType(str, Enum):
@@ -75,5 +77,5 @@ class PublishPostResponse(BaseModel):
     publish_record_id: str = Field(..., description="Internal publish record identifier")
     platform: SocialPlatform = Field(..., description="Platform used for publication")
     status: str = Field(..., description="Publish status")
-    linkedin_post_urn: Optional[str] = Field(default=None, description="LinkedIn post URN")
+    platform_post_id: Optional[str] = Field(default=None, description="Published platform post identifier")
     error_details: Optional[str] = Field(default=None, description="Error details if publishing failed")

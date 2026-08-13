@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from backend.models.social_account import SocialAccount
 from backend.models.social_publish_record import SocialPublishRecord
 from backend.schemas.social_schema import ConnectionStatusResponse, PublishPostRequest, PublishPostResponse, SocialConnectionStatus, SocialPlatform
+from backend.services.meta_api_service import MetaAPIService
 from backend.services.linkedin_api_service import LinkedInAPIService
 from backend.services.social_oauth_service import SocialOAuthService
 
@@ -20,10 +21,12 @@ class SocialPublishService:
         *,
         oauth_service: SocialOAuthService | None = None,
         linkedin_api_service: LinkedInAPIService | None = None,
+        meta_api_service: MetaAPIService | None = None,
     ) -> None:
         self.db = db
         self.oauth_service = oauth_service or SocialOAuthService()
-        self.linkedin_api_service = linkedin_api_service or LinkedInAPIService()
+        self.linkedin_api_service = linkedin_api_service
+        self.meta_api_service = meta_api_service
 
     def get_connection_status(self, platform: SocialPlatform, social_account_id: str | None = None) -> ConnectionStatusResponse:
         query = self.db.query(SocialAccount).filter(SocialAccount.platform == platform.value)
@@ -58,6 +61,185 @@ class SocialPublishService:
         )
 
     def store_linkedin_account(
+        self,
+        *,
+        platform: SocialPlatform,
+        account_type: str,
+        external_id: str,
+        account_name: str,
+        access_token: str,
+        refresh_token: str | None,
+        expires_in: int | None,
+        scopes: list[str],
+    ) -> SocialAccount:
+        return self._store_account(
+            platform=platform,
+            account_type=account_type,
+            external_id=external_id,
+            account_name=account_name,
+            access_token=access_token,
+            refresh_token=refresh_token,
+            expires_in=expires_in,
+            scopes=scopes,
+        )
+
+    def store_meta_accounts(
+        self,
+        *,
+        managed_pages: list[dict],
+        account_type: str,
+        access_token: str,
+        expires_in: int | None,
+        scopes: list[str],
+    ) -> list[SocialAccount]:
+        stored_accounts: list[SocialAccount] = []
+        for page in managed_pages:
+            page_access_token = page.get("access_token")
+            if not page_access_token:
+                continue
+
+            stored_accounts.append(
+                self._store_account(
+                    platform=SocialPlatform.FACEBOOK,
+                    account_type=account_type,
+                    external_id=str(page["id"]),
+                    account_name=page.get("name") or "Facebook Page",
+                    access_token=page_access_token,
+                    refresh_token=None,
+                    expires_in=expires_in,
+                    scopes=scopes,
+                )
+            )
+
+            instagram_account = page.get("instagram_business_account") or {}
+            instagram_external_id = instagram_account.get("id")
+            if instagram_external_id:
+                stored_accounts.append(
+                    self._store_account(
+                        platform=SocialPlatform.INSTAGRAM,
+                        account_type=account_type,
+                        external_id=str(instagram_external_id),
+                        account_name=instagram_account.get("username") or page.get("name") or "Instagram Account",
+                        access_token=page_access_token,
+                        refresh_token=None,
+                        expires_in=expires_in,
+                        scopes=scopes,
+                    )
+                )
+
+        return stored_accounts
+
+    def publish_post(self, request: PublishPostRequest) -> PublishPostResponse:
+        account = self.db.query(SocialAccount).filter(SocialAccount.account_uuid == request.social_account_id).first()
+        if not account:
+            raise ValueError("Social account not found")
+        if account.platform != request.platform.value:
+            raise ValueError("Social account platform does not match publish request platform")
+
+        record = SocialPublishRecord(
+            record_uuid=str(uuid.uuid4()),
+            social_account_id=account.id,
+            platform=request.platform.value,
+            status="pending",
+            text=request.text,
+            hashtags=json.dumps(request.hashtags),
+            media_url=request.media_url,
+        )
+        self.db.add(record)
+        self.db.commit()
+        self.db.refresh(record)
+
+        try:
+            access_token = self.oauth_service.decrypt_secret(account.encrypted_access_token)
+            refresh_token = self.oauth_service.decrypt_secret(account.encrypted_refresh_token) if account.encrypted_refresh_token else None
+
+            if request.platform == SocialPlatform.LINKEDIN and account.expires_at and account.expires_at <= datetime.now(timezone.utc):
+                if not refresh_token:
+                    raise ValueError("Access token expired and refresh token is unavailable")
+                refreshed = self._get_linkedin_api_service().refresh_access_token(refresh_token)
+                access_token = refreshed["access_token"]
+                account.encrypted_access_token = self.oauth_service.encrypt_secret(access_token)
+                if refreshed.get("refresh_token"):
+                    account.encrypted_refresh_token = self.oauth_service.encrypt_secret(refreshed["refresh_token"])
+                expires_in = refreshed.get("expires_in")
+                if expires_in:
+                    account.expires_at = datetime.now(timezone.utc) + timedelta(seconds=int(expires_in))
+                self.db.add(account)
+                self.db.commit()
+                self.db.refresh(account)
+
+            publication_id: str | None = None
+            if request.platform == SocialPlatform.LINKEDIN:
+                post_response = self._get_linkedin_api_service().create_post(
+                    access_token,
+                    author_urn=f"urn:li:person:{account.external_id}",
+                    text=request.text,
+                    media_url=request.media_url,
+                )
+                publication_id = post_response.get("body", {}).get("id") or post_response.get("headers", {}).get("x-restli-id")
+            elif request.platform == SocialPlatform.FACEBOOK:
+                post_response = self._get_meta_api_service().create_facebook_post(
+                    access_token,
+                    page_id=account.external_id,
+                    text=request.text,
+                    media_url=request.media_url,
+                )
+                publication_id = post_response.get("body", {}).get("id") or post_response.get("body", {}).get("post_id")
+            elif request.platform == SocialPlatform.INSTAGRAM:
+                if not request.media_url:
+                    raise ValueError("Instagram publishing requires media_url")
+                post_response = self._get_meta_api_service().create_instagram_post(
+                    access_token,
+                    ig_business_id=account.external_id,
+                    text=request.text,
+                    media_url=request.media_url,
+                )
+                publication_id = (
+                    post_response.get("publish", {}).get("body", {}).get("id")
+                    or post_response.get("publish", {}).get("body", {}).get("media_id")
+                    or post_response.get("container", {}).get("body", {}).get("id")
+                )
+            else:
+                raise ValueError(f"Unsupported social platform: {request.platform.value}")
+
+            record.status = "published"
+            record.platform_post_id = publication_id
+            record.error_details = None
+            self.db.add(record)
+            self.db.commit()
+            self.db.refresh(record)
+            return PublishPostResponse(
+                publish_record_id=str(record.record_uuid),
+                platform=request.platform,
+                status=record.status,
+                platform_post_id=publication_id,
+                error_details=None,
+            )
+        except Exception as exc:
+            record.status = "failed"
+            record.error_details = str(exc)
+            self.db.add(record)
+            self.db.commit()
+            self.db.refresh(record)
+            return PublishPostResponse(
+                publish_record_id=str(record.record_uuid),
+                platform=request.platform,
+                status=record.status,
+                platform_post_id=record.platform_post_id,
+                error_details=record.error_details,
+            )
+
+    def _get_meta_api_service(self) -> MetaAPIService:
+        if self.meta_api_service is None:
+            self.meta_api_service = MetaAPIService()
+        return self.meta_api_service
+
+    def _get_linkedin_api_service(self) -> LinkedInAPIService:
+        if self.linkedin_api_service is None:
+            self.linkedin_api_service = LinkedInAPIService()
+        return self.linkedin_api_service
+
+    def _store_account(
         self,
         *,
         platform: SocialPlatform,
@@ -105,77 +287,3 @@ class SocialPublishService:
         self.db.commit()
         self.db.refresh(account)
         return account
-
-    def publish_post(self, request: PublishPostRequest) -> PublishPostResponse:
-        if request.platform != SocialPlatform.LINKEDIN:
-            raise ValueError("Only LinkedIn publishing is supported")
-
-        account = self.db.query(SocialAccount).filter(SocialAccount.account_uuid == request.social_account_id).first()
-        if not account:
-            raise ValueError("Social account not found")
-
-        record = SocialPublishRecord(
-            record_uuid=str(uuid.uuid4()),
-            social_account_id=account.id,
-            platform=request.platform.value,
-            status="pending",
-            text=request.text,
-            hashtags=json.dumps(request.hashtags),
-            media_url=request.media_url,
-        )
-        self.db.add(record)
-        self.db.commit()
-        self.db.refresh(record)
-
-        try:
-            access_token = self.oauth_service.decrypt_secret(account.encrypted_access_token)
-            refresh_token = self.oauth_service.decrypt_secret(account.encrypted_refresh_token) if account.encrypted_refresh_token else None
-
-            if account.expires_at and account.expires_at <= datetime.now(timezone.utc):
-                if not refresh_token:
-                    raise ValueError("Access token expired and refresh token is unavailable")
-                refreshed = self.linkedin_api_service.refresh_access_token(refresh_token)
-                access_token = refreshed["access_token"]
-                account.encrypted_access_token = self.oauth_service.encrypt_secret(access_token)
-                if refreshed.get("refresh_token"):
-                    account.encrypted_refresh_token = self.oauth_service.encrypt_secret(refreshed["refresh_token"])
-                expires_in = refreshed.get("expires_in")
-                if expires_in:
-                    account.expires_at = datetime.now(timezone.utc) + timedelta(seconds=int(expires_in))
-                self.db.add(account)
-                self.db.commit()
-                self.db.refresh(account)
-
-            post_response = self.linkedin_api_service.create_post(
-                access_token,
-                author_urn=f"urn:li:person:{account.external_id}",
-                text=request.text,
-                media_url=request.media_url,
-            )
-            linkedin_post_urn = post_response.get("body", {}).get("id") or post_response.get("headers", {}).get("x-restli-id")
-            record.status = "published"
-            record.linkedin_post_urn = linkedin_post_urn
-            record.error_details = None
-            self.db.add(record)
-            self.db.commit()
-            self.db.refresh(record)
-            return PublishPostResponse(
-                publish_record_id=str(record.record_uuid),
-                platform=request.platform,
-                status=record.status,
-                linkedin_post_urn=linkedin_post_urn,
-                error_details=None,
-            )
-        except Exception as exc:
-            record.status = "failed"
-            record.error_details = str(exc)
-            self.db.add(record)
-            self.db.commit()
-            self.db.refresh(record)
-            return PublishPostResponse(
-                publish_record_id=str(record.record_uuid),
-                platform=request.platform,
-                status=record.status,
-                linkedin_post_urn=record.linkedin_post_urn,
-                error_details=record.error_details,
-            )

@@ -14,13 +14,18 @@ from backend.schemas.social_schema import SocialAccountType, SocialPlatform
 
 
 class SocialOAuthService:
-    AUTH_BASE_URL = "https://www.linkedin.com/oauth/v2/authorization"
+    LINKEDIN_AUTH_BASE_URL = "https://www.linkedin.com/oauth/v2/authorization"
+    META_AUTH_BASE_URL = "https://www.facebook.com/v21.0/dialog/oauth"
+
+    META_SCOPES = [
+        "pages_show_list",
+        "pages_read_engagement",
+        "pages_manage_posts",
+        "instagram_basic",
+        "instagram_content_publish",
+    ]
 
     def __init__(self) -> None:
-        self.client_id = self._require_env("LINKEDIN_CLIENT_ID")
-        self.client_secret = self._require_env("LINKEDIN_CLIENT_SECRET")
-        self.default_redirect_uri = self._require_env("LINKEDIN_REDIRECT_URI")
-        self.scopes = self._get_scopes()
         self.fernet = Fernet(self._require_env("SOCIAL_TOKEN_ENCRYPTION_KEY").encode("utf-8"))
 
     def build_authorization_url(
@@ -28,23 +33,34 @@ class SocialOAuthService:
         *,
         platform: SocialPlatform,
         account_type: SocialAccountType,
-        redirect_uri: str | None = None,
     ) -> tuple[str, str]:
-        if platform != SocialPlatform.LINKEDIN:
-            raise ValueError("Only LinkedIn is supported for this flow")
+        provider_config = self._get_provider_config(platform)
+        resolved_redirect_uri = provider_config["redirect_uri"]
 
-        resolved_redirect_uri = redirect_uri or self.default_redirect_uri
         state = self.generate_state(platform=platform, account_type=account_type, redirect_uri=resolved_redirect_uri)
-        query = urlencode(
-            {
-                "response_type": "code",
-                "client_id": self.client_id,
-                "redirect_uri": resolved_redirect_uri,
-                "scope": " ".join(self.scopes),
-                "state": state,
-            }
-        )
-        return f"{self.AUTH_BASE_URL}?{query}", state
+
+        if platform == SocialPlatform.FACEBOOK:
+            query = urlencode(
+                {
+                    "client_id": provider_config["client_id"],
+                    "redirect_uri": resolved_redirect_uri,
+                    "config_id": provider_config["config_id"],
+                    "response_type": "code",
+                    "override_default_response_type": "true",
+                    "state": state,
+                }
+            )
+        else:
+            query = urlencode(
+                {
+                    "response_type": "code",
+                    "client_id": provider_config["client_id"],
+                    "redirect_uri": resolved_redirect_uri,
+                    "scope": " ".join(provider_config["scopes"]),
+                    "state": state,
+                }
+            )
+        return f"{provider_config['auth_base_url']}?{query}", state
 
     def generate_state(self, *, platform: SocialPlatform, account_type: SocialAccountType, redirect_uri: str) -> str:
         payload = {
@@ -60,14 +76,21 @@ class SocialOAuthService:
             payload_bytes,
             hashlib.sha256,
         ).digest()
-        token = base64.urlsafe_b64encode(payload_bytes + b"." + signature).decode("utf-8")
-        return token
+
+        payload_b64 = base64.urlsafe_b64encode(payload_bytes).rstrip(b"=").decode("ascii")
+        signature_b64 = base64.urlsafe_b64encode(signature).rstrip(b"=").decode("ascii")
+        return f"{payload_b64}.{signature_b64}"
 
     def verify_state(self, state: str) -> dict:
         try:
-            decoded = base64.urlsafe_b64decode(state.encode("utf-8"))
-            payload_bytes, signature = decoded.rsplit(b".", 1)
+            payload_b64, signature_b64 = state.split(".", 1)
         except ValueError as exc:
+            raise ValueError("Invalid OAuth state format") from exc
+
+        try:
+            payload_bytes = self._b64_decode(payload_b64)
+            signature = self._b64_decode(signature_b64)
+        except Exception as exc:
             raise ValueError("Invalid OAuth state format") from exc
 
         expected_signature = hmac.new(
@@ -85,6 +108,10 @@ class SocialOAuthService:
 
         return payload
 
+    def _b64_decode(self, value: str) -> bytes:
+        padding = "=" * (-len(value) % 4)
+        return base64.urlsafe_b64decode(value + padding)
+
     def encrypt_secret(self, value: str) -> str:
         return self.fernet.encrypt(value.encode("utf-8")).decode("utf-8")
 
@@ -100,6 +127,34 @@ class SocialOAuthService:
             raise ValueError(f"{name} is not set")
         return value
 
-    def _get_scopes(self) -> list[str]:
-        scopes = os.getenv("LINKEDIN_SCOPES", "openid profile email w_member_social")
+    def get_scopes(self, platform: SocialPlatform) -> list[str]:
+        return self._get_scopes(platform)
+
+    def _get_scopes(self, platform: SocialPlatform) -> list[str]:
+        if platform == SocialPlatform.FACEBOOK:
+            scopes = os.getenv("META_SCOPES", " ".join(self.META_SCOPES))
+        else:
+            scopes = os.getenv("LINKEDIN_SCOPES", "openid profile email w_member_social")
         return [scope for scope in scopes.split() if scope]
+
+    def _get_provider_config(self, platform: SocialPlatform) -> dict[str, str | list[str]]:
+        if platform == SocialPlatform.FACEBOOK:
+            return {
+                "auth_base_url": self.META_AUTH_BASE_URL,
+                "client_id": self._require_env("META_CLIENT_ID"),
+                "client_secret": self._require_env("META_CLIENT_SECRET"),
+                "redirect_uri": self._require_env("META_REDIRECT_URI"),
+                "config_id": self._require_env("META_CONFIG_ID"),
+                "scopes": self._get_scopes(platform),
+            }
+
+        if platform == SocialPlatform.LINKEDIN:
+            return {
+                "auth_base_url": self.LINKEDIN_AUTH_BASE_URL,
+                "client_id": self._require_env("LINKEDIN_CLIENT_ID"),
+                "client_secret": self._require_env("LINKEDIN_CLIENT_SECRET"),
+                "redirect_uri": self._require_env("LINKEDIN_REDIRECT_URI"),
+                "scopes": self._get_scopes(platform),
+            }
+
+        raise ValueError(f"Unsupported social platform: {platform.value}")
