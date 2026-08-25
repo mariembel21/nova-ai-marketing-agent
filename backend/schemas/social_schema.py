@@ -11,6 +11,7 @@ class SocialPlatform(str, Enum):
     LINKEDIN = "linkedin"
     FACEBOOK = "facebook"
     INSTAGRAM = "instagram"
+    X = "x"
 
 
 class SocialAccountType(str, Enum):

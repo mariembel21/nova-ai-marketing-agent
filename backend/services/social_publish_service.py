@@ -12,6 +12,7 @@ from backend.schemas.social_schema import ConnectionStatusResponse, PublishPostR
 from backend.services.meta_api_service import MetaAPIService
 from backend.services.linkedin_api_service import LinkedInAPIService
 from backend.services.social_oauth_service import SocialOAuthService
+from backend.services.x_api_service import XAPIService
 
 
 class SocialPublishService:
@@ -22,11 +23,13 @@ class SocialPublishService:
         oauth_service: SocialOAuthService | None = None,
         linkedin_api_service: LinkedInAPIService | None = None,
         meta_api_service: MetaAPIService | None = None,
+        x_api_service: XAPIService | None = None,
     ) -> None:
         self.db = db
         self.oauth_service = oauth_service or SocialOAuthService()
         self.linkedin_api_service = linkedin_api_service
         self.meta_api_service = meta_api_service
+        self.x_api_service = x_api_service
 
     def get_connection_status(self, platform: SocialPlatform, social_account_id: str | None = None) -> ConnectionStatusResponse:
         query = self.db.query(SocialAccount).filter(SocialAccount.platform == platform.value)
@@ -61,6 +64,29 @@ class SocialPublishService:
         )
 
     def store_linkedin_account(
+        self,
+        *,
+        platform: SocialPlatform,
+        account_type: str,
+        external_id: str,
+        account_name: str,
+        access_token: str,
+        refresh_token: str | None,
+        expires_in: int | None,
+        scopes: list[str],
+    ) -> SocialAccount:
+        return self._store_account(
+            platform=platform,
+            account_type=account_type,
+            external_id=external_id,
+            account_name=account_name,
+            access_token=access_token,
+            refresh_token=refresh_token,
+            expires_in=expires_in,
+            scopes=scopes,
+        )
+
+    def store_x_account(
         self,
         *,
         platform: SocialPlatform,
@@ -153,10 +179,11 @@ class SocialPublishService:
             access_token = self.oauth_service.decrypt_secret(account.encrypted_access_token)
             refresh_token = self.oauth_service.decrypt_secret(account.encrypted_refresh_token) if account.encrypted_refresh_token else None
 
-            if request.platform == SocialPlatform.LINKEDIN and account.expires_at and account.expires_at <= datetime.now(timezone.utc):
+            if request.platform in (SocialPlatform.LINKEDIN, SocialPlatform.X) and account.expires_at and account.expires_at <= datetime.now(timezone.utc):
                 if not refresh_token:
                     raise ValueError("Access token expired and refresh token is unavailable")
-                refreshed = self._get_linkedin_api_service().refresh_access_token(refresh_token)
+                api_service = self._get_x_api_service() if request.platform == SocialPlatform.X else self._get_linkedin_api_service()
+                refreshed = api_service.refresh_access_token(refresh_token)
                 access_token = refreshed["access_token"]
                 account.encrypted_access_token = self.oauth_service.encrypt_secret(access_token)
                 if refreshed.get("refresh_token"):
@@ -199,6 +226,9 @@ class SocialPublishService:
                     or post_response.get("publish", {}).get("body", {}).get("media_id")
                     or post_response.get("container", {}).get("body", {}).get("id")
                 )
+            elif request.platform == SocialPlatform.X:
+                post_response = self._get_x_api_service().create_post(access_token, request.text)
+                publication_id = post_response.get("body", {}).get("data", {}).get("id")
             else:
                 raise ValueError(f"Unsupported social platform: {request.platform.value}")
 
@@ -238,6 +268,11 @@ class SocialPublishService:
         if self.linkedin_api_service is None:
             self.linkedin_api_service = LinkedInAPIService()
         return self.linkedin_api_service
+
+    def _get_x_api_service(self) -> XAPIService:
+        if self.x_api_service is None:
+            self.x_api_service = XAPIService()
+        return self.x_api_service
 
     def _store_account(
         self,

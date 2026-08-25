@@ -5,6 +5,7 @@ import hashlib
 import hmac
 import json
 import os
+import secrets
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
 
@@ -16,6 +17,7 @@ from backend.schemas.social_schema import SocialAccountType, SocialPlatform
 class SocialOAuthService:
     LINKEDIN_AUTH_BASE_URL = "https://www.linkedin.com/oauth/v2/authorization"
     META_AUTH_BASE_URL = "https://www.facebook.com/v21.0/dialog/oauth"
+    X_AUTH_BASE_URL = "https://x.com/i/oauth2/authorize"
 
     META_SCOPES = [
         "pages_show_list",
@@ -24,6 +26,7 @@ class SocialOAuthService:
         "instagram_basic",
         "instagram_content_publish",
     ]
+    X_SCOPES = ["tweet.read", "tweet.write", "users.read", "offline.access"]
 
     def __init__(self) -> None:
         self.fernet = Fernet(self._require_env("SOCIAL_TOKEN_ENCRYPTION_KEY").encode("utf-8"))
@@ -37,9 +40,8 @@ class SocialOAuthService:
         provider_config = self._get_provider_config(platform)
         resolved_redirect_uri = provider_config["redirect_uri"]
 
-        state = self.generate_state(platform=platform, account_type=account_type, redirect_uri=resolved_redirect_uri)
-
         if platform == SocialPlatform.FACEBOOK:
+            state = self.generate_state(platform=platform, account_type=account_type, redirect_uri=resolved_redirect_uri)
             query = urlencode(
                 {
                     "client_id": provider_config["client_id"],
@@ -50,7 +52,27 @@ class SocialOAuthService:
                     "state": state,
                 }
             )
+        elif platform == SocialPlatform.X:
+            code_verifier, code_challenge = self._generate_pkce_pair()
+            state = self.generate_state(
+                platform=platform,
+                account_type=account_type,
+                redirect_uri=resolved_redirect_uri,
+                code_verifier=code_verifier,
+            )
+            query = urlencode(
+                {
+                    "response_type": "code",
+                    "client_id": provider_config["client_id"],
+                    "redirect_uri": resolved_redirect_uri,
+                    "scope": " ".join(provider_config["scopes"]),
+                    "state": state,
+                    "code_challenge": code_challenge,
+                    "code_challenge_method": "S256",
+                }
+            )
         else:
+            state = self.generate_state(platform=platform, account_type=account_type, redirect_uri=resolved_redirect_uri)
             query = urlencode(
                 {
                     "response_type": "code",
@@ -62,7 +84,14 @@ class SocialOAuthService:
             )
         return f"{provider_config['auth_base_url']}?{query}", state
 
-    def generate_state(self, *, platform: SocialPlatform, account_type: SocialAccountType, redirect_uri: str) -> str:
+    def generate_state(
+        self,
+        *,
+        platform: SocialPlatform,
+        account_type: SocialAccountType,
+        redirect_uri: str,
+        code_verifier: str | None = None,
+    ) -> str:
         payload = {
             "platform": platform.value,
             "account_type": account_type.value,
@@ -70,6 +99,8 @@ class SocialOAuthService:
             "iat": datetime.now(timezone.utc).isoformat(),
             "nonce": base64.urlsafe_b64encode(os.urandom(16)).decode("utf-8").rstrip("="),
         }
+        if code_verifier is not None:
+            payload["code_verifier"] = self.encrypt_secret(code_verifier)
         payload_bytes = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
         signature = hmac.new(
             self.fernet._signing_key,  # type: ignore[attr-defined]
@@ -106,7 +137,16 @@ class SocialOAuthService:
         if datetime.now(timezone.utc) - issued_at > timedelta(minutes=10):
             raise ValueError("OAuth state has expired")
 
+        encrypted_code_verifier = payload.get("code_verifier")
+        if encrypted_code_verifier:
+            payload["code_verifier"] = self.decrypt_secret(encrypted_code_verifier)
+
         return payload
+
+    def _generate_pkce_pair(self) -> tuple[str, str]:
+        code_verifier = secrets.token_urlsafe(64)
+        code_challenge = base64.urlsafe_b64encode(hashlib.sha256(code_verifier.encode("utf-8")).digest()).decode("ascii").rstrip("=")
+        return code_verifier, code_challenge
 
     def _b64_decode(self, value: str) -> bytes:
         padding = "=" * (-len(value) % 4)
@@ -133,6 +173,8 @@ class SocialOAuthService:
     def _get_scopes(self, platform: SocialPlatform) -> list[str]:
         if platform == SocialPlatform.FACEBOOK:
             scopes = os.getenv("META_SCOPES", " ".join(self.META_SCOPES))
+        elif platform == SocialPlatform.X:
+            scopes = os.getenv("X_SCOPES", " ".join(self.X_SCOPES))
         else:
             scopes = os.getenv("LINKEDIN_SCOPES", "openid profile email w_member_social")
         return [scope for scope in scopes.split() if scope]
@@ -154,6 +196,15 @@ class SocialOAuthService:
                 "client_id": self._require_env("LINKEDIN_CLIENT_ID"),
                 "client_secret": self._require_env("LINKEDIN_CLIENT_SECRET"),
                 "redirect_uri": self._require_env("LINKEDIN_REDIRECT_URI"),
+                "scopes": self._get_scopes(platform),
+            }
+
+        if platform == SocialPlatform.X:
+            return {
+                "auth_base_url": self.X_AUTH_BASE_URL,
+                "client_id": self._require_env("X_CLIENT_ID"),
+                "client_secret": self._require_env("X_CLIENT_SECRET"),
+                "redirect_uri": self._require_env("X_REDIRECT_URI"),
                 "scopes": self._get_scopes(platform),
             }
 
