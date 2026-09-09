@@ -60,15 +60,3 @@ The current implementation uses:
 
 Generated responses are structured and validated using Pydantic models rather than being returned as unrestricted text.
 
-### AI Request Flow
-
-```mermaid
-flowchart LR
-    A[Client Request] --> B[FastAPI Route]
-    B --> C[Specialized Agent]
-    C --> D[LangGraph Workflow]
-    D --> E[Prompt Construction]
-    E --> F[Groq LLM]
-    F --> G[Structured JSON Response]
-    G --> H[Pydantic Validation]
-    H --> I[API Response]
